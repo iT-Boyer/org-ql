@@ -86,6 +86,11 @@ Returns (STRING . MARKER) cons."
   (cons (org-entry-get nil "ITEM") (point-marker)))
 
 (defun org-ql-completing-read-snippet (marker)
+  "Return snippet for entry at MARKER.
+Returns value returned by function
+`org-ql-completing-read-snippet-function' or
+`org-ql-completing-read--snippet-simple', whichever returns a
+value, or nil."
   (while-no-input
     ;; Using `while-no-input' here doesn't make it as
     ;; responsive as, e.g. Helm while typing, but it seems to
@@ -93,6 +98,17 @@ Returns (STRING . MARKER) cons."
     (org-with-point-at marker
       (or (funcall org-ql-completing-read-snippet-function)
           (org-ql-completing-read--snippet-simple)))))
+
+(defun org-ql-completing-read-path (marker)
+  "Return formatted outline path for entry at MARKER."
+  (org-with-point-at marker
+    (let* ((path (thread-first (org-get-outline-path nil t)
+                               (org-format-outline-path (window-width) nil "")
+                               (org-split-string "")))
+           (formatted-path (if org-ql-completing-read-reverse-paths
+                               (concat "\\" (string-join (reverse path) "\\"))
+                             (concat "/" (string-join path "/")))))
+      formatted-path)))
 
 ;;;;; Completing read
 
@@ -102,18 +118,10 @@ Returns (STRING . MARKER) cons."
                    (action #'org-ql-completing-read-action)
                    (annotate #'org-ql-completing-read-snippet)
                    (snippet #'org-ql-completing-read-snippet)
-                   (path (lambda (marker)
-                           (org-with-point-at marker
-                             (let* ((path (thread-first (org-get-outline-path nil t)
-                                                        (org-format-outline-path (window-width) nil "")
-                                                        (org-split-string "")))
-                                    (formatted-path (if org-ql-completing-read-reverse-paths
-                                                        (concat "\\" (string-join (reverse path) "\\"))
-                                                      (concat "/" (string-join path "/")))))
-                               formatted-path))))
+                   (path #'org-ql-completing-read-path)
                    (action-filter #'list)
                    (prompt "Find entry: "))
-  "Return marker at Org entry in BUFFERS-FILES selected with `org-ql'.
+  "Return marker at entry in BUFFERS-FILES selected with `org-ql'.
 PROMPT is shown to the user.
 
 QUERY-PREFIX may be a string to prepend to the query entered by
@@ -139,7 +147,6 @@ single predicate)."
   ;;  (message "ORG-QL-COMPLETING-READ: Starts.")
   (let ((table (make-hash-table :test #'equal))
         (disambiguations (make-hash-table :test #'equal))
-        (window-width (window-width))
         last-input org-outline-path-cache query-tokens)
     (cl-labels (;; (debug-message
                 ;;  (f &rest args) (apply #'message (concat "ORG-QL-COMPLETING-READ: " f) args))
@@ -153,15 +160,6 @@ single predicate)."
                            (setf string (format "%s <%s>" string (cl-incf suffix)))
                          (setf string (format "%s <%s>" string (puthash string 2 disambiguations)))))
                      (puthash string marker table))))
-                ;; (path (marker)
-                ;;       (org-with-point-at marker
-                ;;         (let* ((path (thread-first (org-get-outline-path nil t)
-                ;;                                    (org-format-outline-path window-width nil "")
-                ;;                                    (org-split-string "")))
-                ;;                (formatted-path (if org-ql-completing-read-reverse-paths
-                ;;                                    (concat "\\" (string-join (reverse path) "\\"))
-                ;;                                  (concat "/" (string-join path "/")))))
-                ;;           formatted-path)))
                 (todo
                  (marker) (if-let (it (org-entry-get marker "TODO"))
                               (concat (propertize it 'face (org-get-todo-face it)) " ")
@@ -178,14 +176,6 @@ single predicate)."
                           (if annotate
                               (or (funcall annotate (gethash candidate table)) "")
                             ""))
-                ;; (snippet
-                ;;  (marker) (when-let
-                ;;               ((snippet
-                ;;                 (org-with-point-at marker
-                ;;                   (or (funcall org-ql-completing-read-snippet-function snippet-regexp)
-                ;;                       (org-ql-completing-read--snippet-simple)))))
-                ;;             (propertize (concat " " snippet)
-                ;;                         'face 'org-ql-completing-read-snippet)))
                 (group (candidate transform)
                        (when candidate
                          (pcase transform
