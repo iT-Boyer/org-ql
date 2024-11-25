@@ -1,6 +1,6 @@
 ;;; org-ql-completing-read.el --- Completing read of Org entries using org-ql  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022  Adam Porter
+;; Copyright (C) 2022-2023  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 
@@ -26,6 +26,19 @@
 
 (require 'org-ql)
 
+(declare-function org-ql-search "org-ql-search")
+(declare-function org-ql--normalize-query "org-ql" t t)
+
+;;;; Variables
+
+(defvar-keymap org-ql-completing-read-map
+  :doc "Active during `org-ql-completing-read' sessions."
+  "C-c C-e" #'org-ql-completing-read-export)
+
+;; `embark-collect' doesn't work for `org-ql-completing-read', so remap
+;; it to `embark-export' (which `keymap-set', et al doesn't allow).
+(define-key org-ql-completing-read-map [remap embark-collect] 'embark-export)
+
 ;;;; Customization
 
 (defgroup org-ql-completing-read nil
@@ -37,12 +50,10 @@
   :type 'boolean)
 
 (defcustom org-ql-completing-read-snippet-function #'org-ql-completing-read--snippet-simple
-  ;; TODO: I'd like to make the -regexp one the default, but with
-  ;; default Emacs completion affixation, it can sometimes be a bit
-  ;; slow, and I don't want that to be a user's first impression.  It
-  ;; may be possible to further optimize the -regexp one so that it
-  ;; can be used by default.  In the meantime, the -simple one seems
-  ;; fast enough for general use.
+  ;; TODO(v0.9): Performance of completion annotations seems to be
+  ;; much improved now (whether due to changes in Emacs, Vertico, or
+  ;; both, I don't know).  It may be reasonable to make the context
+  ;; snippet the default now.
   "Function used to annotate results in `org-ql-completing-read'.
 Function is called at entry beginning.  (When set to
 `org-ql-completing-read--snippet-regexp', it is called with a
@@ -82,7 +93,7 @@ To be used in, e.g. annotation functions.")
 (defun org-ql-completing-read-action ()
   "Default action for `org-ql-completing-read'.
 Returns (STRING . MARKER) cons for entry at point."
-  (font-lock-ensure (point-at-bol) (point-at-eol))
+  (font-lock-ensure (pos-bol) (pos-eol))
   (cons (org-link-display-format (org-entry-get nil "ITEM")) (point-marker)))
 
 (defun org-ql-completing-read-snippet (marker)
@@ -96,11 +107,13 @@ value, or nil."
            ;; responsive as, e.g. Helm while typing, but it seems to
            ;; help a little when using the org-rifle-style snippets.
            (org-with-point-at marker
-             (or (funcall org-ql-completing-read-snippet-function)
+             (or (funcall org-ql-completing-read-snippet-function
+                          org-ql-completing-read-input-regexp)
                  (org-ql-completing-read--snippet-simple))))
     (`t  ;; Interrupted: return nil (which can be concatted).
      nil)
-    (else else)))
+    (else (propertize (concat " " else)
+                      'face 'org-ql-completing-read-snippet))))
 
 (defun org-ql-completing-read-path (marker)
   "Return formatted outline path for entry at MARKER."
@@ -114,18 +127,25 @@ value, or nil."
 
 ;;;;; Completing read
 
+(defun org-ql-completing-read-export ()
+  "Show `org-ql-view' buffer for current `org-ql-completing-read'-based search."
+  (interactive)
+  (user-error "Not in an `org-ql-completing-read' session"))
+
 ;;;###autoload
 (cl-defun org-ql-completing-read
-    (buffers-files &key query-prefix query-filter
+    (buffers-files &key query-prefix query-filter narrowp
                    (action #'org-ql-completing-read-action)
                    ;; FIXME: Unused argument.
-                   (annotate #'org-ql-completing-read-snippet)
+                   ;; (annotate #'org-ql-completing-read-snippet)
                    (snippet #'org-ql-completing-read-snippet)
                    (path #'org-ql-completing-read-path)
                    (action-filter #'list)
                    (prompt "Find entry: "))
   "Return marker at entry in BUFFERS-FILES selected with `org-ql'.
 PROMPT is shown to the user.
+
+NARROWP is passed to `org-ql-select', which see.
 
 QUERY-PREFIX may be a string to prepend to the query entered by
 the user (e.g. use \"heading:\" to only search headings, easily
@@ -155,7 +175,7 @@ single predicate)."
     (cl-labels (;; (debug-message
                 ;;  (f &rest args) (apply #'message (concat "ORG-QL-COMPLETING-READ: " f) args))
                 (action ()
-                  (font-lock-ensure (point-at-bol) (point-at-eol))
+                  (font-lock-ensure (pos-bol) (pos-eol))
                   ;; This function needs to handle multiple candidates per
                   ;; call, so we loop over a list of values by default.
                   (pcase-dolist (`(,string . ,marker) (funcall action-filter (funcall action)))
@@ -173,7 +193,6 @@ single predicate)."
                               (setf string (format "%s <%s>" string (cl-incf suffix)))
                             (setf string (format "%s <%s>" string (puthash string 2 disambiguations)))))
                         (puthash (propertize string 'org-marker marker) marker table)))))
-
                 (path (marker)
                   (org-with-point-at marker
                     (let* ((path (thread-first (org-get-outline-path nil t)
@@ -183,10 +202,10 @@ single predicate)."
                                                (concat "\\" (string-join (reverse path) "\\"))
                                              (concat "/" (string-join path "/")))))
                       formatted-path)))
-                (todo
-                  (marker) (if-let (it (org-entry-get marker "TODO"))
-                               (concat (propertize it 'face (org-get-todo-face it)) " ")
-                             ""))
+                (todo (marker)
+                  (if-let (it (org-entry-get marker "TODO"))
+                      (concat (propertize it 'face (org-get-todo-face it)) " ")
+                    ""))
                 (affix (completions)
                   ;; (debug-message "AFFIX:%S" completions)
                   (cl-loop for completion in completions
@@ -200,15 +219,7 @@ single predicate)."
                     ;; Using `while-no-input' here doesn't make it as responsive as,
                     ;; e.g. Helm while typing, but it seems to help a little when using the
                     ;; org-rifle-style snippets.
-                    (or (snippet (get-text-property 0 'org-marker candidate)) "")))
-                (snippet
-                  (marker) (when-let
-                               ((snippet
-                                 (org-with-point-at marker
-                                   (or (funcall org-ql-completing-read-snippet-function org-ql-completing-read-input-regexp)
-                                       (org-ql-completing-read--snippet-simple)))))
-                             (propertize (concat " " snippet)
-                                         'face 'org-ql-completing-read-snippet)))
+                    (or (funcall snippet (get-text-property 0 'org-marker candidate)) "")))
                 (group (candidate transform)
                   (pcase transform
                     (`nil (buffer-name (marker-buffer (get-text-property 0 'org-marker candidate))))
@@ -306,6 +317,7 @@ single predicate)."
                                                 bow (or ,@query-tokens) (0+ (not space))
                                                 (optional (repeat 1 3 (0+ space) (repeat 1 15 (not space))))))))
                     (org-ql-select buffers-files (org-ql--query-string-to-sexp input)
+                      :narrow narrowp
                       :action #'action))))
       (unless (listp buffers-files)
         ;; Since we map across this argument, we ensure it's a list.
@@ -321,8 +333,25 @@ single predicate)."
       ;; `completing-read'.
       (mapc #'org-ql--ensure-buffer buffers-files)
       (let* ((completion-styles '(org-ql-completing-read))
-             (completion-styles-alist (list (list 'org-ql-completing-read #'try #'all "Org QL Find")))
-             (selected (completing-read prompt #'collection nil t)))
+             (completion-styles-alist (cons (list 'org-ql-completing-read #'try #'all "Org QL Find")
+                                            completion-styles-alist))
+             (selected
+              (minibuffer-with-setup-hook
+                  (lambda ()
+                    (use-local-map (make-composed-keymap org-ql-completing-read-map (current-local-map))))
+                (cl-letf* (((symbol-function 'org-ql-completing-read-export)
+                            (lambda ()
+                              (interactive)
+                              (run-at-time 0 nil
+                                           #'org-ql-search
+                                           buffers-files
+                                           (minibuffer-contents-no-properties))
+                              (if (fboundp 'minibuffer-quit-recursive-edit)
+                                  (minibuffer-quit-recursive-edit)
+                                (abort-recursive-edit))))
+                           ((symbol-function 'embark-export)
+                            (symbol-function 'org-ql-completing-read-export)))
+                  (completing-read prompt #'collection nil t)))))
         ;; (debug-message "SELECTED:%S  KEYS:%S" selected (hash-table-keys table))
         (or (gethash selected table)
             ;; If there are completions in the table, but none of them exactly match the user input
@@ -337,7 +366,7 @@ single predicate)."
             (car (hash-table-values table))
             (user-error "No results for input"))))))
 
-(defun org-ql-completing-read--snippet-simple ()
+(defun org-ql-completing-read--snippet-simple (&optional _input-regexp)
   "Return a snippet of the current entry.
 Returns up to `org-ql-completing-read-snippet-length' characters."
   (save-excursion
@@ -351,15 +380,15 @@ Returns up to `org-ql-completing-read-snippet-length' characters."
                                            t t)
                  50 nil nil t))))))
 
-(defun org-ql-completing-read--snippet-regexp (regexp)
-  "Return a snippet of the current entry's matches for REGEXP."
+(defun org-ql-completing-read--snippet-regexp (&optional input-regexp)
+  "Return a snippet of the current entry's matches for INPUT-REGEXP."
   ;; REGEXP may be nil if there are no qualifying tokens in the query.
-  (when regexp
+  (when input-regexp
     (save-excursion
       (org-end-of-meta-data t)
       (unless (org-at-heading-p)
         (let* ((end (org-entry-end-position))
-               (snippets (cl-loop while (re-search-forward regexp end t)
+               (snippets (cl-loop while (re-search-forward input-regexp end t)
                                   concat (match-string 0) concat "…"
                                   do (goto-char (match-end 0)))))
           (unless (string-empty-p snippets)

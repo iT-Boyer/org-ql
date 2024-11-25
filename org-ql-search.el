@@ -1,5 +1,7 @@
 ;;; org-ql-search.el --- Search commands for org-ql  -*- lexical-binding: t; -*-
 
+;; Copyright (C) 2019-2023  Adam Porter
+
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; Url: https://github.com/alphapapa/org-ql
 
@@ -38,6 +40,8 @@
 (require 'org-ql)
 (require 'org-ql-view)
 
+(declare-function org-ql--normalize-query "org-ql" t t)
+
 ;;;; Compatibility
 
 (defalias 'org-ql-search--link-heading-search-string
@@ -55,6 +59,16 @@
   (cond ((fboundp 'org-link-store-props) #'org-link-store-props)
         ((fboundp 'org-store-link-props) #'org-store-link-props)
         (t (error "org-ql: Unable to define alias `org-ql-search--org-link-store-props'.  Please report this as a bug"))))
+
+(defalias 'org-ql--org-hide-archived-subtrees
+  (if (version<= "9.6" org-version)
+      'org-fold-hide-archived-subtrees
+    'org-hide-archived-subtrees))
+
+(defalias 'org-ql--org-show-context
+  (if (version<= "9.6" org-version)
+      'org-fold-show-context
+    'org-show-context))
 
 ;;;; Variables
 
@@ -124,10 +138,10 @@ Runs `org-occur-hook' after making the sparse tree."
                     query))))
       (org-ql-select buffer query
         :action (lambda ()
-                  (org-show-context 'occur-tree)
+                  (org-ql--org-show-context 'occur-tree)
                   (cl-incf num-results)))
       (unless org-sparse-tree-open-archived-trees
-        (org-hide-archived-subtrees (point-min) (point-max)))
+        (org-ql--org-hide-archived-subtrees (point-min) (point-max)))
       (run-hooks 'org-occur-hook)
       (unless (get-buffer-window buffer)
         (pop-to-buffer buffer))
@@ -172,7 +186,7 @@ necessary."
   (interactive (list (org-ql-view--complete-buffers-files)
                      (read-string "Query: " (when org-ql-view-query
                                               (format "%S" org-ql-view-query)))
-                     :narrow (or org-ql-view-narrow (eq current-prefix-arg '(4)))
+                     :narrow (or org-ql-view-narrow (equal current-prefix-arg '(4)))
                      :super-groups (org-ql-view--complete-super-groups)
                      :sort (org-ql-view--complete-sort)))
   ;; NOTE: Using `with-temp-buffer' is a hack to work around the fact that `make-local-variable'
@@ -208,8 +222,7 @@ necessary."
                                          (symbol (symbol-value super-groups))
                                          (list super-groups))))
           (setf strings (org-super-agenda--group-items strings))))
-      (org-ql-view--display :buffer buffer :header header
-        :string (s-join "\n" strings)))))
+      (org-ql-view--display :buffer buffer :header header :strings strings))))
 
 ;;;###autoload
 (defun org-ql-search-block (query)
@@ -335,23 +348,24 @@ this (must be a single line in the Org buffer):
                                    (org-element-property (intern (concat ":" (upcase property))) element)))))
           (elements (org-ql-query :from (current-buffer)
                                   :where query
-                                  :select '(org-element-headline-parser (line-end-position))
+                                  :select '(org-ql-view--resolve-element-properties
+                                            (org-element-headline-parser (line-end-position)))
                                   :order-by sort)))
     (when take
       (setf elements (cl-etypecase take
                        ((and integer (satisfies cl-minusp)) (-take-last (abs take) elements))
                        (integer (-take take elements)))))
-    (cl-labels ((format-element
-                 (element) (string-join (cl-loop for column in columns
-                                                 collect (or (pcase-exhaustive column
-                                                               ((pred symbolp)
-                                                                (funcall (alist-get column format-fns) element))
-                                                               (`((,column . ,args) ,_header)
-                                                                (apply (alist-get column format-fns) element args))
-                                                               (`(,column ,_header)
-                                                                (funcall (alist-get column format-fns) element)))
-                                                             ""))
-                                        " | ")))
+    (cl-labels ((format-element (element)
+                  (string-join (cl-loop for column in columns
+                                        collect (or (pcase-exhaustive column
+                                                      ((pred symbolp)
+                                                       (funcall (alist-get column format-fns) element))
+                                                      (`((,column . ,args) ,_header)
+                                                       (apply (alist-get column format-fns) element args))
+                                                      (`(,column ,_header)
+                                                       (funcall (alist-get column format-fns) element)))
+                                                    ""))
+                               " | ")))
       ;; Table header
       (insert "| " (string-join (--map (pcase it
                                          ((pred symbolp) (capitalize (symbol-name it)))

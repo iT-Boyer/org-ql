@@ -26,6 +26,7 @@ and saved views.
 * Installation::
 * Usage::
 * Changelog::
+* Development::
 * Notes::
 * License::
 
@@ -72,7 +73,19 @@ Functions / Macros
 
 Changelog
 
-* 0.8-pre: 08-pre.
+* 0.9-pre: 09-pre.
+* 0.8.10: 0810.
+* 0.8.9: 089.
+* 0.8.8: 088.
+* 0.8.7: 087.
+* 0.8.6: 086.
+* 0.8.5: 085.
+* 0.8.4: 084.
+* 0.8.3: 083.
+* 0.8.2: 082.
+* 0.8.1: 081.
+* 0.8: 08.
+* 0.7.4: 074.
 * 0.7.3: 073.
 * 0.7.2: 072.
 * 0.7.1: 071.
@@ -103,6 +116,14 @@ Changelog
 * 0.2: 02.
 * 0.1: 01.
 
+0.9-pre
+
+* helm-org-ql: helm-org-ql (1).
+
+Development
+
+* Copyright assignment::
+
 Notes
 
 * Comparison with Org Agenda searches::
@@ -115,7 +136,7 @@ File: README.info,  Node: Contents,  Next: Screenshots,  Prev: Top,  Up: Top
 1 Contents
 **********
 
-   • • • • 
+   • • • • • 
 
 File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Contents,  Up: Top
 
@@ -236,7 +257,9 @@ completion facilities with an Org QL query:
    Note that these commands are compatible with Embark
 (https://github.com/oantolin/embark): the ‘embark-act’ command can be
 called on a completion candidate (i.e.  a search result) to act on it
-immediately, without having to visit the entry in its source Org buffer.
+immediately, without having to visit the entry in its source Org buffer,
+and ‘embark-export’ may be called to show the results in an
+‘org-ql-view’ buffer.
 
 
 File: README.info,  Node: org-ql-open-link,  Next: org-ql-refile,  Prev: org-ql-find,  Up: Commands
@@ -520,9 +543,8 @@ Arguments are listed next to predicate names, where applicable.
      Return non-nil if current entry has ‘PROPERTY’ (a string), and
      optionally ‘VALUE’ (a string).  If ‘INHERIT’ is nil, only match
      entries with ‘PROPERTY’ set on the entry; if t, also match entries
-     with inheritance.  If ‘INHERIT’ is not specified, use the Boolean
-     value of ‘org-use-property-inheritance’, which see (i.e.  it is
-     only interpreted as nil or non-nil).
+     with inheritance.  If ‘INHERIT’ is not specified, use the value of
+     ‘org-use-property-inheritance’, which see.
 ‘regexp (&rest regexps)’
      Return non-nil if current entry matches all of ‘REGEXPS’ (regexp
      strings).  Matches against entire entry, from beginning of its
@@ -1013,7 +1035,7 @@ File: README.info,  Node: Tips,  Prev: Links,  Up: Usage
      (https://github.com/alphapapa/burly.el).
 
 
-File: README.info,  Node: Changelog,  Next: Notes,  Prev: Usage,  Up: Top
+File: README.info,  Node: Changelog,  Next: Development,  Prev: Usage,  Up: Top
 
 5 Changelog
 ***********
@@ -1026,7 +1048,19 @@ releases.
 
 * Menu:
 
-* 0.8-pre: 08-pre.
+* 0.9-pre: 09-pre.
+* 0.8.10: 0810.
+* 0.8.9: 089.
+* 0.8.8: 088.
+* 0.8.7: 087.
+* 0.8.6: 086.
+* 0.8.5: 085.
+* 0.8.4: 084.
+* 0.8.3: 083.
+* 0.8.2: 082.
+* 0.8.1: 081.
+* 0.8: 08.
+* 0.7.4: 074.
 * 0.7.3: 073.
 * 0.7.2: 072.
 * 0.7.1: 071.
@@ -1058,10 +1092,220 @@ releases.
 * 0.1: 01.
 
 
-File: README.info,  Node: 08-pre,  Next: 073,  Up: Changelog
+File: README.info,  Node: 09-pre,  Next: 0810,  Up: Changelog
 
-5.1 0.8-pre
+5.1 0.9-pre
 ===========
+
+*Additions*
+   • Face ‘org-ql-view-query’, applied to view queries in header line.
+   • Face ‘org-ql-view-title’, applied to view titles in header line.
+   • Option ‘org-ql-view-relative-deadline-prefix’.
+
+   *Changes*
+   • Command ‘org-ql-find’ respects narrowing of the current buffer by
+     default, allowing searching within the narrowed region.  (Using one
+     ‘C-u’ argument widens the current buffer, and using two ‘C-u’
+     arguments prompts for the buffers to search.)
+   • Function ‘org-ql-completing-read’ accepts a new ‘NARROWP’ argument,
+     which is passed to ‘org-ql-select’.
+
+   *Fixes*
+   • Customization group for face ‘org-ql-view-due-date’.
+   • Apply Org syntax font-locking to items in ‘org-ql-view’ buffers.
+
+* Menu:
+
+* helm-org-ql: helm-org-ql (1).
+
+
+File: README.info,  Node: helm-org-ql (1),  Up: 09-pre
+
+5.1.1 helm-org-ql
+-----------------
+
+Tagged v0.6.2, fixing a compilation warning.
+
+
+File: README.info,  Node: 0810,  Next: 089,  Prev: 09-pre,  Up: Changelog
+
+5.2 0.8.10
+==========
+
+*Fixes*
+   • Command ‘org-ql-refile’ uses the base buffer when refiling to an
+     indirect buffer.  (#466
+     (https://github.com/alphapapa/org-ql/issues/466).)
+   • Predicate ‘link’ could signal an error when searching text that is
+     mistakenly recognized as an Org link (e.g.  Bash double-bracket
+     constructs in a source block).  (Thanks to John Wiegley
+     (https://github.com/jwiegley) for reporting.)
+
+
+File: README.info,  Node: 089,  Next: 088,  Prev: 0810,  Up: Changelog
+
+5.3 0.8.9
+=========
+
+*Fixes*
+   • Predicate ‘property’ when called with argument form ‘(property
+     "PROPERTY-NAME" :inherit t)’.  (#460
+     (https://github.com/alphapapa/org-ql/issues/460).  Thanks to
+     Stewmath (https://github.com/Stewmath) for reporting.)
+   • Predicate ‘level’’s preamble optimizer allows expressions in place
+     of the numeric argument.  (See #460
+     (https://github.com/alphapapa/org-ql/issues/460).  Thanks to
+     Stewmath (https://github.com/Stewmath) for reporting.)
+   • Reading of view settings from Org links in upcoming Emacs version.
+     (#461 (https://github.com/alphapapa/org-ql/issues/461).  Thanks to
+     Ola Nilsson (https://github.com/snogge) for help debugging, and for
+     maintaining Buttercup
+     (https://github.com/jorgenschaefer/emacs-buttercup).)
+
+   *Compatibility*
+   • Fix compilation error on Emacs 30.  (#433
+     (https://github.com/alphapapa/org-ql/issues/433).  Thanks to Akira
+     Komamura (https://github.com/akirak) and Stefan Monnier
+     (https://github.com/monnier).)
+
+
+File: README.info,  Node: 088,  Next: 087,  Prev: 089,  Up: Changelog
+
+5.4 0.8.8
+=========
+
+*Fixes*
+   • Remove text properties from to-do keywords before displaying them
+     in an ‘org-ql-view’ buffer.  (Such text properties could cause them
+     to, e.g.  display with extra leading spaces, depending on which
+     other modes might be enabled in the source Org buffer.)
+   • Binding of ‘completion-styles-alist’ in ‘org-ql-completing-read’.
+     (This fixes compatibility with Helm’s ‘helm’ completion style, as
+     well as default Emacs completion in recursive minibuffers.  #337
+     (https://github.com/alphapapa/org-ql/issues/337).  Thanks to
+     Nicholas Vollmer (https://github.com/progfolio), viz
+     (https://github.com/9viz), and Karthik Chikmagalur
+     (https://github.com/karthink) for reporting and suggesting fixes.)
+   • Use of the context snippet function for ‘org-ql-completing-read’.
+     (#419 (https://github.com/alphapapa/org-ql/issues/419).  Thanks to
+     tpeacock19 (https://github.com/tpeacock19) for reporting.)
+
+
+File: README.info,  Node: 087,  Next: 086,  Prev: 088,  Up: Changelog
+
+5.5 0.8.7
+=========
+
+*Fixes*
+   • Timestamps with internal time ranges (e.g.  ‘<2024-06-26
+     10:00-11:00>’) are matched for simple queries.  (This support is
+     not yet comprehensive, e.g.  a query that depends on the specific
+     inner time range may not behave as expected.  Previously such
+     timestamps were not matched at all.  See #237
+     (https://github.com/alphapapa/org-ql/pull/237) and #371
+     (https://github.com/alphapapa/org-ql/issues/371).  Thanks to Ihor
+     Radchenko (https://github.com/yantar92).)
+   • Timestamps with day-of-the-week abbreviations are matched more
+     flexibly (allowing, e.g.  a period in French locales).  (See #429
+     (https://github.com/alphapapa/org-ql/discussions/429), #432
+     (https://github.com/alphapapa/org-ql/issues/432).  Thanks to
+     Florian D.  (https://github.com/neurolit) for reporting.)
+   • Command ‘org-ql-search’ did not narrow properly when called
+     interactively.
+
+   *Compatibility*
+   • Dynamic blocks work with Org 9.7.  (#431
+     (https://github.com/alphapapa/org-ql/issues/431).  Thanks to Jez
+     Cope (https://github.com/jezcope) for reporting.)
+
+
+File: README.info,  Node: 086,  Next: 085,  Prev: 087,  Up: Changelog
+
+5.6 0.8.6
+=========
+
+*Fixes*
+   • Bookmarking ‘org-ql-view’ buffers when the ‘buffers-files’ argument
+     is a symbol (like ‘org-agenda-files’).
+
+
+File: README.info,  Node: 085,  Next: 084,  Prev: 086,  Up: Changelog
+
+5.7 0.8.5
+=========
+
+*Fixes*
+   • Predicate ‘heading’ incorrectly matched strings as regular
+     expressions, sometimes returning incorrect results.  (See
+     discussion (https://github.com/alphapapa/org-ql/discussions/410).
+     Thanks to Alex Popescu (https://github.com/al3xandru) for
+     reporting.)
+   • Predicates ‘ancestor’ and ‘parent’ did not normalize their
+     sub-queries, sometimes returning incorrect results.  (#365
+     (https://github.com/alphapapa/org-ql/issues/365).  Thanks to
+     Gabriele Mongiano (https://github.com/kofm) for reporting.)
+
+
+File: README.info,  Node: 084,  Next: 083,  Prev: 085,  Up: Changelog
+
+5.8 0.8.4
+=========
+
+*Fixes*
+
+   • Command ‘org-ql-find’ goes to the selected entry in the base buffer
+     (rather than potentially an indirect buffer, whose narrowing could
+     leave the selected entry hidden.  The nuances around going to
+     entries in buffers that may be indirect and/or narrowed are
+     surprisingly complicated.  Hopefully this is the last fix).
+
+
+File: README.info,  Node: 083,  Next: 082,  Prev: 084,  Up: Changelog
+
+5.9 0.8.3
+=========
+
+*Fixes*
+
+   • Command ‘org-ql-find’ incorrectly moved point.  (See #380
+     (https://github.com/alphapapa/org-ql/issues/380#issuecomment-1881913025).
+     Thanks to Omar Antolín Camarena (https://github.com/oantolin) for
+     reporting.)
+
+
+File: README.info,  Node: 082,  Next: 081,  Prev: 083,  Up: Changelog
+
+5.10 0.8.2
+==========
+
+*Fixes*
+
+   • Command ‘org-ql-find’ incorrectly restored the buffer after jumping
+     when not using indirect buffers.  (See #380
+     (https://github.com/alphapapa/org-ql/issues/380#issuecomment-1881913025).
+     Thanks to Bram Schoenmakers (https://github.com/bram85) for
+     reporting.)
+
+
+File: README.info,  Node: 081,  Next: 08,  Prev: 082,  Up: Changelog
+
+5.11 0.8.1
+==========
+
+*Fixes*
+
+   • Command ‘org-ql-find’ widens the buffer before going to the
+     selected entry.
+   • In ‘org-ql-view’ buffers, links in headings remain clickable links.
+     (Fixes #282 (https://github.com/alphapapa/org-ql/issues/282).
+     Thanks to Jacob Boxerman (https://github.com/jakebox) for
+     reporting.)
+
+
+File: README.info,  Node: 08,  Next: 074,  Prev: 081,  Up: Changelog
+
+5.12 0.8
+========
 
 *Additions*
 
@@ -1075,6 +1319,10 @@ File: README.info,  Node: 08-pre,  Next: 073,  Up: Changelog
      Thanks to Omar Antolín Camarena (https://github.com/oantolin),
      Daniel Mendler (https://github.com/minad), and Akira Komamura
      (https://github.com/akirak).)
+        • Command ‘org-ql-completing-read-export’, bound to ‘C-c C-e’ or
+          ‘embark-export’ while in an ‘org-ql-completing-read’ session,
+          exits and shows an ‘org-ql-view’ buffer for the current
+          search.
    • Command ‘org-ql-find’ may be called in an ‘org-agenda’ or
      ‘org-ql-view’ buffer to search the buffers which contributed to the
      agenda/view buffer.
@@ -1087,19 +1335,43 @@ File: README.info,  Node: 08-pre,  Next: 073,  Up: Changelog
      containing the desired link, then locate it within the entry, and
      then open it, the user can simply select the link and open it
      directly.)
+   • Items in ‘org-ql-view’ buffers now include the ‘org-category’ text
+     property, like Org Agenda buffers, which allows grouping with
+     ‘org-super-agenda’’s category-related selectors.  (#363
+     (https://github.com/alphapapa/org-ql/issues/363).  Thanks to
+     Gabriele Mongiano (https://github.com/kofm) for reporting.)
+
+   *Fixes*
+
+   • Predicate ‘property’ correctly uses the value of
+     ‘org-use-property-inheritance’ when not specified.  (#346
+     (https://github.com/alphapapa/org-ql/pull/346), #356
+     (https://github.com/alphapapa/org-ql/issues/356).  Thanks to Bram
+     Schoenmakers (https://github.com/bram85).)
 
    *Compatibility*
 
+   • Emacs 27.1 or later is now required.
    • Org v9.7’s ‘org-element’ API changes required some adjustments.
      (#364 (https://github.com/alphapapa/org-ql/issues/364).  Thanks to
      several users for reporting, and to Ihor Radchenko
      (https://github.com/yantar92) for his feedback.)
 
 
-File: README.info,  Node: 073,  Next: 072,  Prev: 08-pre,  Up: Changelog
+File: README.info,  Node: 074,  Next: 073,  Prev: 08,  Up: Changelog
 
-5.2 0.7.3
-=========
+5.13 0.7.4
+==========
+
+*Fixes*
+   • Ignore empty quoted strings in plain-string queries (#383
+     (https://github.com/alphapapa/org-ql/issues/383)).
+
+
+File: README.info,  Node: 073,  Next: 072,  Prev: 074,  Up: Changelog
+
+5.14 0.7.3
+==========
 
 *Fixes*
    • Disable ‘case-fold-search’ when collecting headings in outline
@@ -1116,8 +1388,8 @@ File: README.info,  Node: 073,  Next: 072,  Prev: 08-pre,  Up: Changelog
 
 File: README.info,  Node: 072,  Next: 071,  Prev: 073,  Up: Changelog
 
-5.3 0.7.2
-=========
+5.15 0.7.2
+==========
 
 *Fixes*
    • Timestamp predicates are more tolerant of partial input (e.g.
@@ -1137,8 +1409,8 @@ File: README.info,  Node: 072,  Next: 071,  Prev: 073,  Up: Changelog
 
 File: README.info,  Node: 071,  Next: 07,  Prev: 072,  Up: Changelog
 
-5.4 0.7.1
-=========
+5.16 0.7.1
+==========
 
 *Fixes*
    • Function ‘org-ql-completing-read’ is more compatible with default
@@ -1156,13 +1428,12 @@ File: README.info,  Node: 071,  Next: 07,  Prev: 072,  Up: Changelog
 
 File: README.info,  Node: 07,  Next: 063,  Prev: 071,  Up: Changelog
 
-5.5 0.7
-=======
+5.17 0.7
+========
 
 *Added*
-   • Commands ‘org-ql-find’, ‘org-ql-find-heading’, and
-     ‘org-ql-find-path’, which jump to entries selected using Emacs’s
-     built-in completion facilities and Org QL queries (like
+   • Command ‘org-ql-find’, which jumps to entries selected using
+     Emacs’s built-in completion facilities and Org QL queries (like
      ‘helm-org-ql’, but doesn’t require Helm.).
    • Command ‘org-ql-refile’, which refiles the entry at point to one
      selected using Org QL completion.
@@ -1216,8 +1487,8 @@ File: README.info,  Node: 07,  Next: 063,  Prev: 071,  Up: Changelog
 
 File: README.info,  Node: 063,  Next: 062,  Prev: 07,  Up: Changelog
 
-5.6 0.6.3
-=========
+5.18 0.6.3
+==========
 
 *Fixed*
    • Non-sexp query parsing with updated version 1.0.1 of the ‘peg’
@@ -1232,8 +1503,8 @@ File: README.info,  Node: 063,  Next: 062,  Prev: 07,  Up: Changelog
 
 File: README.info,  Node: 062,  Next: 061,  Prev: 063,  Up: Changelog
 
-5.7 0.6.2
-=========
+5.19 0.6.2
+==========
 
 *Fixed*
    • ‘link’ predicate when used in an ‘or’’ed query.  (#279
@@ -1243,8 +1514,8 @@ File: README.info,  Node: 062,  Next: 061,  Prev: 063,  Up: Changelog
 
 File: README.info,  Node: 061,  Next: 06,  Prev: 062,  Up: Changelog
 
-5.8 0.6.1
-=========
+5.20 0.6.1
+==========
 
 *Fixed*
    • In dynamic blocks, links to headings with statistics cookies were
@@ -1261,8 +1532,8 @@ File: README.info,  Node: 061,  Next: 06,  Prev: 062,  Up: Changelog
 
 File: README.info,  Node: 06,  Next: 052,  Prev: 061,  Up: Changelog
 
-5.9 0.6
-=======
+5.21 0.6
+========
 
 *Added*
    • Macro ‘org-ql-defpred’, used to define search predicates.  (See
@@ -1328,7 +1599,7 @@ File: README.info,  Node: 06,  Next: 052,  Prev: 061,  Up: Changelog
 
 File: README.info,  Node: 052,  Next: 051,  Prev: 06,  Up: Changelog
 
-5.10 0.5.2
+5.22 0.5.2
 ==========
 
 *Fixed*
@@ -1339,7 +1610,7 @@ File: README.info,  Node: 052,  Next: 051,  Prev: 06,  Up: Changelog
 
 File: README.info,  Node: 051,  Next: 05,  Prev: 052,  Up: Changelog
 
-5.11 0.5.1
+5.23 0.5.1
 ==========
 
 *Fixed*
@@ -1352,7 +1623,7 @@ File: README.info,  Node: 051,  Next: 05,  Prev: 052,  Up: Changelog
 
 File: README.info,  Node: 05,  Next: 049,  Prev: 051,  Up: Changelog
 
-5.12 0.5
+5.24 0.5
 ========
 
 *Added*
@@ -1393,7 +1664,7 @@ File: README.info,  Node: 05,  Next: 049,  Prev: 051,  Up: Changelog
 
 File: README.info,  Node: 049,  Next: 048,  Prev: 05,  Up: Changelog
 
-5.13 0.4.9
+5.25 0.4.9
 ==========
 
 *Fixed*
@@ -1404,7 +1675,7 @@ File: README.info,  Node: 049,  Next: 048,  Prev: 05,  Up: Changelog
 
 File: README.info,  Node: 048,  Next: 047,  Prev: 049,  Up: Changelog
 
-5.14 0.4.8
+5.26 0.4.8
 ==========
 
 *Fixed*
@@ -1416,7 +1687,7 @@ File: README.info,  Node: 048,  Next: 047,  Prev: 049,  Up: Changelog
 
 File: README.info,  Node: 047,  Next: 046,  Prev: 048,  Up: Changelog
 
-5.15 0.4.7
+5.27 0.4.7
 ==========
 
 *Fixed*
@@ -1429,7 +1700,7 @@ File: README.info,  Node: 047,  Next: 046,  Prev: 048,  Up: Changelog
 
 File: README.info,  Node: 046,  Next: 045,  Prev: 047,  Up: Changelog
 
-5.16 0.4.6
+5.28 0.4.6
 ==========
 
 *Fixed*
@@ -1442,7 +1713,7 @@ File: README.info,  Node: 046,  Next: 045,  Prev: 047,  Up: Changelog
 
 File: README.info,  Node: 045,  Next: 044,  Prev: 046,  Up: Changelog
 
-5.17 0.4.5
+5.29 0.4.5
 ==========
 
 *Fixed*
@@ -1454,7 +1725,7 @@ File: README.info,  Node: 045,  Next: 044,  Prev: 046,  Up: Changelog
 
 File: README.info,  Node: 044,  Next: 043,  Prev: 045,  Up: Changelog
 
-5.18 0.4.4
+5.30 0.4.4
 ==========
 
 *Fixed*
@@ -1466,7 +1737,7 @@ File: README.info,  Node: 044,  Next: 043,  Prev: 045,  Up: Changelog
 
 File: README.info,  Node: 043,  Next: 042,  Prev: 044,  Up: Changelog
 
-5.19 0.4.3
+5.31 0.4.3
 ==========
 
 *Fixed*
@@ -1476,7 +1747,7 @@ File: README.info,  Node: 043,  Next: 042,  Prev: 044,  Up: Changelog
 
 File: README.info,  Node: 042,  Next: 041,  Prev: 043,  Up: Changelog
 
-5.20 0.4.2
+5.32 0.4.2
 ==========
 
 *Fixed*
@@ -1485,7 +1756,7 @@ File: README.info,  Node: 042,  Next: 041,  Prev: 043,  Up: Changelog
 
 File: README.info,  Node: 041,  Next: 04,  Prev: 042,  Up: Changelog
 
-5.21 0.4.1
+5.33 0.4.1
 ==========
 
 *Fixed*
@@ -1495,7 +1766,7 @@ File: README.info,  Node: 041,  Next: 04,  Prev: 042,  Up: Changelog
 
 File: README.info,  Node: 04,  Next: 032,  Prev: 041,  Up: Changelog
 
-5.22 0.4
+5.34 0.4
 ========
 
 _Note:_ The next release, 0.5, may include changes which will require
@@ -1576,7 +1847,7 @@ automatically, as they will be pushed to the ‘master’ branch when ready.
 
 File: README.info,  Node: 032,  Next: 031,  Prev: 04,  Up: Changelog
 
-5.23 0.3.2
+5.35 0.3.2
 ==========
 
 *Fixed*
@@ -1589,7 +1860,7 @@ File: README.info,  Node: 032,  Next: 031,  Prev: 04,  Up: Changelog
 
 File: README.info,  Node: 031,  Next: 03,  Prev: 032,  Up: Changelog
 
-5.24 0.3.1
+5.36 0.3.1
 ==========
 
 *Fixed*
@@ -1599,7 +1870,7 @@ File: README.info,  Node: 031,  Next: 03,  Prev: 032,  Up: Changelog
 
 File: README.info,  Node: 03,  Next: 023,  Prev: 031,  Up: Changelog
 
-5.25 0.3
+5.37 0.3
 ========
 
 *Added*
@@ -1667,7 +1938,7 @@ File: README.info,  Node: 03,  Next: 023,  Prev: 031,  Up: Changelog
 
 File: README.info,  Node: 023,  Next: 022,  Prev: 03,  Up: Changelog
 
-5.26 0.2.3
+5.38 0.2.3
 ==========
 
 *Fixed*
@@ -1677,7 +1948,7 @@ File: README.info,  Node: 023,  Next: 022,  Prev: 03,  Up: Changelog
 
 File: README.info,  Node: 022,  Next: 021,  Prev: 023,  Up: Changelog
 
-5.27 0.2.2
+5.39 0.2.2
 ==========
 
 *Fixed*
@@ -1688,7 +1959,7 @@ File: README.info,  Node: 022,  Next: 021,  Prev: 023,  Up: Changelog
 
 File: README.info,  Node: 021,  Next: 02,  Prev: 022,  Up: Changelog
 
-5.28 0.2.1
+5.40 0.2.1
 ==========
 
 *Fixed*
@@ -1698,7 +1969,7 @@ File: README.info,  Node: 021,  Next: 02,  Prev: 022,  Up: Changelog
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 021,  Up: Changelog
 
-5.29 0.2
+5.41 0.2
 ========
 
 *Added*
@@ -1781,15 +2052,42 @@ File: README.info,  Node: 02,  Next: 01,  Prev: 021,  Up: Changelog
 
 File: README.info,  Node: 01,  Prev: 02,  Up: Changelog
 
-5.30 0.1
+5.42 0.1
 ========
 
 First tagged release.
 
 
-File: README.info,  Node: Notes,  Next: License,  Prev: Changelog,  Up: Top
+File: README.info,  Node: Development,  Next: Notes,  Prev: Changelog,  Up: Top
 
-6 Notes
+6 Development
+*************
+
+Bug reports, feature requests, and suggestions are welcome.  For
+patches, see below.
+
+* Menu:
+
+* Copyright assignment::
+
+
+File: README.info,  Node: Copyright assignment,  Up: Development
+
+6.1 Copyright assignment
+========================
+
+While Org QL is currently distributed in MELPA, it’s intended
+(https://github.com/alphapapa/org-ql/issues/409) to merge Org QL into
+Org mode.  When that happens, it will become a part of Emacs and Org,
+and therefore cumulative contributions of more than 15 lines of code
+will require that the author assign copyright of such contributions to
+the FSF.  Authors who are interested in doing so may contact
+assign@gnu.org <assign@gnu.org> to request the appropriate form.
+
+
+File: README.info,  Node: Notes,  Next: License,  Prev: Development,  Up: Top
+
+7 Notes
 *******
 
 * Menu:
@@ -1800,7 +2098,7 @@ File: README.info,  Node: Notes,  Next: License,  Prev: Changelog,  Up: Top
 
 File: README.info,  Node: Comparison with Org Agenda searches,  Next: org-sidebar,  Up: Notes
 
-6.1 Comparison with Org Agenda searches
+7.1 Comparison with Org Agenda searches
 =======================================
 
 Of course, queries like these can already be written with Org Agenda
@@ -1820,7 +2118,7 @@ todo:TO-READ’, or in Lisp syntax, ‘(and "lisp" (todo "TO-READ"))’.
 
 File: README.info,  Node: org-sidebar,  Prev: Comparison with Org Agenda searches,  Up: Notes
 
-6.2 org-sidebar
+7.2 org-sidebar
 ===============
 
 This package is used by org-sidebar
@@ -1830,7 +2128,7 @@ customizable agenda-like view in a sidebar window.
 
 File: README.info,  Node: License,  Prev: Notes,  Up: Top
 
-7 License
+8 License
 *********
 
 GPLv3
@@ -1839,75 +2137,90 @@ GPLv3
 
 Tag Table:
 Node: Top225
-Node: Contents1845
-Node: Screenshots1968
-Node: Installation2086
-Node: Quelpa2600
-Node: Helm support3128
-Node: Usage3531
-Node: Commands3929
-Node: org-ql-find4394
-Node: org-ql-open-link5212
-Node: org-ql-refile6067
-Node: org-ql-search6395
-Node: helm-org-ql8326
-Node: org-ql-view8704
-Node: org-ql-view-sidebar9234
-Node: org-ql-view-recent-items9614
-Node: org-ql-sparse-tree10110
-Node: Queries10910
-Node: Non-sexp query syntax12027
-Node: General predicates13786
-Node: Ancestor/descendant predicates20773
-Node: Date/time predicates21901
-Node: Functions / Macros25025
-Node: Agenda-like views25323
-Ref: Function org-ql-block25485
-Node: Listing / acting-on results26746
-Ref: Caching26954
-Ref: Function org-ql-select27867
-Ref: Function org-ql-query30293
-Ref: Macro org-ql (deprecated)32067
-Node: Custom predicates32382
-Ref: Macro org-ql-defpred32606
-Node: Dynamic block36047
-Node: Links38771
-Node: Tips39458
-Node: Changelog39782
-Node: 08-pre40592
-Node: 07342357
-Node: 07243092
-Node: 07144011
-Node: 0744820
-Node: 06347744
-Node: 06248275
-Node: 06148580
-Node: 0649148
-Node: 05252202
-Node: 05152504
-Node: 0552929
-Node: 04954460
-Node: 04854742
-Node: 04755091
-Node: 04655500
-Node: 04555908
-Node: 04456269
-Node: 04356628
-Node: 04256831
-Node: 04156992
-Node: 0457239
-Node: 03261340
-Node: 03161743
-Node: 0361940
-Node: 02365240
-Node: 02265474
-Node: 02165754
-Node: 0265959
-Node: 0170037
-Node: Notes70138
-Node: Comparison with Org Agenda searches70300
-Node: org-sidebar71189
-Node: License71468
+Node: Contents2109
+Node: Screenshots2236
+Node: Installation2354
+Node: Quelpa2868
+Node: Helm support3396
+Node: Usage3799
+Node: Commands4197
+Node: org-ql-find4662
+Node: org-ql-open-link5570
+Node: org-ql-refile6425
+Node: org-ql-search6753
+Node: helm-org-ql8684
+Node: org-ql-view9062
+Node: org-ql-view-sidebar9592
+Node: org-ql-view-recent-items9972
+Node: org-ql-sparse-tree10468
+Node: Queries11268
+Node: Non-sexp query syntax12385
+Node: General predicates14144
+Node: Ancestor/descendant predicates21069
+Node: Date/time predicates22197
+Node: Functions / Macros25321
+Node: Agenda-like views25619
+Ref: Function org-ql-block25781
+Node: Listing / acting-on results27042
+Ref: Caching27250
+Ref: Function org-ql-select28163
+Ref: Function org-ql-query30589
+Ref: Macro org-ql (deprecated)32363
+Node: Custom predicates32678
+Ref: Macro org-ql-defpred32902
+Node: Dynamic block36343
+Node: Links39067
+Node: Tips39754
+Node: Changelog40078
+Node: 09-pre41061
+Node: helm-org-ql (1)41987
+Node: 081042128
+Node: 08942657
+Node: 08843797
+Node: 08744873
+Node: 08646101
+Node: 08546335
+Node: 08446991
+Node: 08347443
+Node: 08247784
+Node: 08148179
+Node: 0848602
+Node: 07451328
+Node: 07351553
+Node: 07252287
+Node: 07153208
+Node: 0754019
+Node: 06356885
+Node: 06257418
+Node: 06157725
+Node: 0658295
+Node: 05261351
+Node: 05161653
+Node: 0562078
+Node: 04963609
+Node: 04863891
+Node: 04764240
+Node: 04664649
+Node: 04565057
+Node: 04465418
+Node: 04365777
+Node: 04265980
+Node: 04166141
+Node: 0466388
+Node: 03270489
+Node: 03170892
+Node: 0371089
+Node: 02374389
+Node: 02274623
+Node: 02174903
+Node: 0275108
+Node: 0179186
+Node: Development79287
+Node: Copyright assignment79520
+Node: Notes80110
+Node: Comparison with Org Agenda searches80274
+Node: org-sidebar81163
+Node: License81442
 
 End Tag Table
 
